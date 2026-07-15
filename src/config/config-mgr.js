@@ -5,7 +5,7 @@ const logger = require('../logger')('config:mgr');
 const schema = require('./schema.json');
 const betterAjvErrors = require('better-ajv-errors');
 const Ajv = require('ajv').default;
-const ajv = new Ajv({ jsonPointers: true });
+const ajv = new Ajv();
 const configPath = path.join(os.homedir(), '.config', 'lab', 'config.json');
 
 module.exports = function getConfig() {

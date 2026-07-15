@@ -1,7 +1,41 @@
 {
+  "type": "object",
   "properties": {
-    "port": {
-      "type": "number"
+    "apiToken": {
+      "type": "string"
+    },
+    "tunnelId": {
+      "type": "string"
+    },
+    "accountId": {
+      "type": "string"
+    },
+    "zoneId": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "sshHost": {
+      "type": "string"
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "number"
+          },
+          "path": {
+            "type": "string"
+          },
+          "run": {
+            "type": "string"
+          }
+        },
+        "required": ["port", "path", "run"]
+      }
     }
   }
 }
