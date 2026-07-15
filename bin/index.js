@@ -7,21 +7,23 @@ const start = require("../src/commands/start");
 const containerUp = require("../src/commands/container-up");
 
 try {
-  const args = arg({
-    "--start": Boolean,
-    "--build": Boolean,
-    "--container-up": Boolean,
-  });
+  const args = arg({});
+  const [noun, ...rest] = args._;
 
   logger.debug("Received args", args);
 
-  if (args["--start"]) {
-    const config = getConfig();
-    start(config);
-  }
-  if (args["--container-up"]) {
-    const config = getConfig();
-    containerUp(config);
+  if (noun === "container") {
+    const [verb, service] = rest;
+    if (verb === "up") {
+      const config = getConfig();
+      containerUp(config, service);
+    } else {
+      logger.warning(`Unknown verb ${verb}`);
+      usage();
+    }
+  } else {
+    logger.warning(`Unknown command ${noun}`);
+    usage();
   }
 } catch (e) {
   logger.warning(e.message);
@@ -31,6 +33,5 @@ try {
 
 function usage() {
   console.log(`${chalk.whiteBright("lab [CMD]")}
-  ${chalk.greenBright("--start")}\tStarts the app
-  ${chalk.greenBright("--container-up")}\tBrings up the container`);
+  ${chalk.greenBright("container up")}\tBrings up the container`);
 }
