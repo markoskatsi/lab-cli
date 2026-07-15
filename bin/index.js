@@ -5,6 +5,7 @@ const chalk = require("chalk");
 const getConfig = require("../src/config/config-mgr");
 const start = require("../src/commands/start");
 const containerUp = require("../src/commands/container-up");
+const containerDown = require("../src/commands/container-down");
 
 try {
   const args = arg({});
@@ -17,6 +18,9 @@ try {
     if (verb === "up") {
       const config = getConfig();
       containerUp(config, service);
+    } else if (verb === "down") {
+      const config = getConfig();
+      containerDown(config, service);
     } else {
       logger.warning(`Unknown verb ${verb}`);
       usage();
@@ -33,5 +37,6 @@ try {
 
 function usage() {
   console.log(`${chalk.whiteBright("lab [CMD]")}
-  ${chalk.greenBright("container up")}\tBrings up the container`);
+    ${chalk.greenBright("container up")}\tBrings up the container
+    ${chalk.greenBright("container down")}\tBrings down the container`);
 }
