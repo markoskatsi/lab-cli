@@ -1,6 +1,6 @@
 const logger = require("../logger")("commands:route-add");
 
-async function cfRequest(config, method, body) {
+async function callFetch(config, method, body) {
   const api = `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/cfd_tunnel/${config.tunnelId}/configurations`;
 
   const response = await fetch(api, {
@@ -21,6 +21,8 @@ async function cfRequest(config, method, body) {
   return text ? JSON.parse(text) : undefined;
 }
 
+
+
 module.exports = async function routeAdd(config, serviceName) {
   logger.highlight("  Adding route  ");
 
@@ -32,9 +34,9 @@ module.exports = async function routeAdd(config, serviceName) {
   }
 
   try {
-    const { result } = await cfRequest(config, "GET");
+    const { result } = await callFetch(config, "GET");
     const { ingress } = result.config;
-    const hostname = `${serviceName}.${config.domain}`;
+    const hostname = `${service.domain}`;
     const rule = { hostname, service: `http://localhost:${service.port}` };
 
     const existing = ingress.findIndex((r) => r.hostname === hostname);
@@ -44,8 +46,9 @@ module.exports = async function routeAdd(config, serviceName) {
       ingress[existing] = rule;
     }
 
-    await cfRequest(config, "PUT", { config: result.config });
+    await callFetch(config, "PUT", { config: result.config });
     logger.log(`Routed ${hostname} -> localhost:${service.port}`);
+    // call add dns 
   } catch (error) {
     logger.warning("Failed to add route", error);
     process.exit(1);
