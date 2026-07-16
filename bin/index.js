@@ -3,7 +3,6 @@ const logger = require("../src/logger")("bin");
 const arg = require("arg");
 const chalk = require("chalk");
 const getConfig = require("../src/config/config-mgr");
-const start = require("../src/commands/start");
 const containerUp = require("../src/commands/container-up");
 const containerDown = require("../src/commands/container-down");
 
