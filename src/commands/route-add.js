@@ -1,0 +1,88 @@
+const logger = require("../logger")("commands:route-add");
+
+async function callFetchRoute(config, method, body) {
+  const api = `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/cfd_tunnel/${config.tunnelId}/configurations`;
+
+  const response = await fetch(api, {
+    method,
+    headers: {
+      Authorization: `Bearer ${config.apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: body && JSON.stringify(body),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(
+      `Cloudflare API request failed (${response.status} ${response.statusText}): ${text}`,
+    );
+  }
+  return text ? JSON.parse(text) : undefined;
+}
+
+async function callFetchDns(config, body) {
+  const api = `https://api.cloudflare.com/client/v4/zones/${config.zoneId}/dns_records`;
+
+  const response = await fetch(api, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: body && JSON.stringify(body),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(
+      `Cloudflare API request failed (${response.status} ${response.statusText}): ${text}`,
+    );
+  }
+  return text ? JSON.parse(text) : undefined;
+}
+
+module.exports = async function routeAdd(config, serviceName) {
+  logger.highlight("  Adding route  ");
+
+  const service = config.services[serviceName];
+  if (!service) {
+    logger.warning(`Unknown service "${serviceName}". Known services:
+  ${Object.keys(config.services).join(", ")}`);
+    process.exit(1);
+  }
+
+  try {
+    const { result } = await callFetchRoute(config, "GET");
+    const { ingress } = result.config;
+    const hostname = `${service.domain}`;
+    const rule = { hostname, service: `http://localhost:${service.port}` };
+
+    const existing = ingress.findIndex((r) => r.hostname === hostname);
+    if (existing === -1) {
+      ingress.splice(ingress.length - 1, 0, rule); // insert before the catch-all rule
+    } else {
+      ingress[existing] = rule;
+    }
+
+    await callFetchRoute(config, "PUT", { config: result.config });
+    logger.log(`Routed ${hostname} -> localhost:${service.port}`);
+
+    logger.log(
+      `Adding DNS record for ${hostname} -> ${config.tunnelId}.cfargotunnel.com`,
+    );
+    await callFetchDns(config, {
+      type: "CNAME",
+      name: hostname,
+      content: `${config.tunnelId}.cfargotunnel.com`,
+      proxied: true,
+      ttl: 1,
+    });
+    logger.log(
+      `DNS record added for ${hostname} -> ${config.tunnelId}.cfargotunnel.com`,
+    );
+  } catch (error) {
+    logger.warning("Failed to add route", error);
+    process.exit(1);
+  }
+};

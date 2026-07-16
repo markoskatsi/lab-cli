@@ -5,6 +5,7 @@ const chalk = require("chalk");
 const getConfig = require("../src/config/config-mgr");
 const containerUp = require("../src/commands/container-up");
 const containerDown = require("../src/commands/container-down");
+const routeAdd = require("../src/commands/route-add");
 
 try {
   const args = arg({});
@@ -20,6 +21,15 @@ try {
     } else if (verb === "down") {
       const config = getConfig();
       containerDown(config, service);
+    } else {
+      logger.warning(`Unknown verb ${verb}`);
+      usage();
+    }
+  } else if (noun === "route") {
+    const [verb, service] = rest;
+    if (verb === "add") {
+      const config = getConfig();
+      routeAdd(config, service);
     } else {
       logger.warning(`Unknown verb ${verb}`);
       usage();
