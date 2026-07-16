@@ -24,6 +24,9 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
+          "domain": {
+            "type": "string"
+          },
           "port": {
             "type": "number"
           },
