@@ -10,36 +10,23 @@ const routeRemove = require("../src/commands/route-remove");
 
 try {
   const args = arg({});
-  const [noun, ...rest] = args._;
+  const config = getConfig();
+
+  const [noun, verb, service] = args._;
+  const command = `${noun} ${verb}`;
 
   logger.debug("Received args", args);
 
-  if (noun === "container") {
-    const [verb, service] = rest;
-    if (verb === "up") {
-      const config = getConfig();
-      containerUp(config, service);
-    } else if (verb === "down") {
-      const config = getConfig();
-      containerDown(config, service);
-    } else {
-      logger.warning(`Unknown verb ${verb}`);
-      usage();
-    }
-  } else if (noun === "route") {
-    const [verb, service] = rest;
-    if (verb === "add") {
-      const config = getConfig();
-      routeAdd(config, service);
-    } else if (verb === "remove") {
-      const config = getConfig();
-      routeRemove(config, service);
-    } else {
-      logger.warning(`Unknown verb ${verb}`);
-      usage();
-    }
+  if (command === "container up") {
+    containerUp(config, service);
+  } else if (command === "container down") {
+    containerDown(config, service);
+  } else if (command === "route add") {
+    routeAdd(config, service);
+  } else if (command === "route remove") {
+    routeRemove(config, service);
   } else {
-    logger.warning(`Unknown command ${noun}`);
+    logger.warning(`Unknown command ${command}`);
     usage();
   }
 } catch (e) {
@@ -50,6 +37,9 @@ try {
 
 function usage() {
   console.log(`${chalk.whiteBright("lab [CMD]")}
-    ${chalk.greenBright("container up")}\tBrings up the container
-    ${chalk.greenBright("container down")}\tBrings down the container`);
+    ${chalk.greenBright("container up".padEnd(18))}Brings up the container
+    ${chalk.greenBright("container down".padEnd(18))}Brings down the container
+    ${chalk.greenBright("route add".padEnd(18))}Adds a route and dns record for a service
+    ${chalk.greenBright("route remove".padEnd(18))}Removes a route and dns record for a service
+  `);
 }
