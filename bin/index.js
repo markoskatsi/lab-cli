@@ -6,6 +6,7 @@ const getConfig = require("../src/config/config-mgr");
 const containerUp = require("../src/commands/container-up");
 const containerDown = require("../src/commands/container-down");
 const routeAdd = require("../src/commands/route-add");
+const routeRemove = require("../src/commands/route-remove");
 
 try {
   const args = arg({});
@@ -30,6 +31,9 @@ try {
     if (verb === "add") {
       const config = getConfig();
       routeAdd(config, service);
+    } else if (verb === "remove") {
+      const config = getConfig();
+      routeRemove(config, service);
     } else {
       logger.warning(`Unknown verb ${verb}`);
       usage();

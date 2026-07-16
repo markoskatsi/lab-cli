@@ -32,6 +32,12 @@ module.exports = {
       body: { config: tunnelConfig },
     }),
 
+  findDnsRecord: (config, name) =>
+    request(config, `${dns(config)}?type=CNAME&name=${encodeURIComponent(name)}`),
+
   createDnsRecord: (config, body) =>
     request(config, dns(config), { method: "POST", body }),
+
+  deleteDnsRecord: (config, id) =>
+    request(config, `${dns(config)}/${id}`, { method: "DELETE" }),
 };
