@@ -9,6 +9,7 @@ const routeAdd = require("../src/commands/route-add");
 const routeRemove = require("../src/commands/route-remove");
 const repoClone = require("../src/commands/repo-clone");
 const repoRemove = require("../src/commands/repo-remove");
+const deployBackend = require("../src/commands/deploy-backend");
 
 const commands = {
   "container up": containerUp,
@@ -17,6 +18,7 @@ const commands = {
   "route remove": routeRemove,
   "repo clone": repoClone,
   "repo remove": repoRemove,
+  "deploy backend": deployBackend,
 };
 
 try {
@@ -50,5 +52,6 @@ function usage() {
     ${chalk.greenBright("route remove".padEnd(18))}Removes a route and dns record for a service
     ${chalk.greenBright("repo clone".padEnd(18))}Clones a service's repository on the server
     ${chalk.greenBright("repo remove".padEnd(18))}Removes a service's cloned repository from the server
+    ${chalk.greenBright("deploy backend".padEnd(18))}Deploys a backend service
   `);
 }
