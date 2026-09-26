@@ -1,8 +1,8 @@
-const logger = require("../logger")("commands:clone-repo");
+const logger = require("../logger")("commands:remove-repo");
 const { execSync } = require("child_process");
 
-module.exports = function cloneRepo(config, serviceName) {
-  logger.highlight("  Cloning the repository  ");
+module.exports = function repoRemove(config, serviceName) {
+  logger.highlight("  Removing the repository  ");
 
   const service = config.services[serviceName];
   if (!service) {
@@ -15,14 +15,16 @@ module.exports = function cloneRepo(config, serviceName) {
     logger.debug(
       `Connecting to ${config.sshHost} and checking for the repo in ${config.projectsPath}`,
     );
-    const remote = `dir=${config.projectsPath}/$(basename ${service.repo} .git); if [ -d $dir/.git ]; then echo LAB_ALREADY_CLONED; else mkdir -p ${config.projectsPath} && cd ${config.projectsPath} && git clone ${service.repo}; fi`;
+    const remote = `dir=${config.projectsPath}/$(basename ${service.repo} .git); if [ -d $dir/.git ]; then rm -rf $dir; echo REMOVED; else echo NOT_FOUND; fi`;
     const output = execSync(`ssh ${config.sshHost} "${remote}"`).toString();
     logger.debug("Command output:", output);
 
-    if (output.includes("LAB_ALREADY_CLONED")) {
-      logger.log(`Repository already cloned in ${config.projectsPath}, skipping`);
+    if (output.includes("REMOVED")) {
+      logger.log(`Removed ${service.repo} from ${config.projectsPath}`);
     } else {
-      logger.log(`Cloned ${service.repo} into ${config.projectsPath}`);
+      logger.log(
+        `No repository found in ${config.projectsPath}, nothing to remove`,
+      );
     }
   } catch (error) {
     logger.warning("Failed to connect to the server via SSH", error);

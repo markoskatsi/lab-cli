@@ -7,8 +7,17 @@ const containerUp = require("../src/commands/container-up");
 const containerDown = require("../src/commands/container-down");
 const routeAdd = require("../src/commands/route-add");
 const routeRemove = require("../src/commands/route-remove");
-const cloneRepo = require("../src/commands/clone-repo");
-const removeRepo = require("../src/commands/remove-repo");
+const repoClone = require("../src/commands/repo-clone");
+const repoRemove = require("../src/commands/repo-remove");
+
+const commands = {
+  "container up": containerUp,
+  "container down": containerDown,
+  "route add": routeAdd,
+  "route remove": routeRemove,
+  "repo clone": repoClone,
+  "repo remove": repoRemove,
+};
 
 try {
   const args = arg({});
@@ -19,22 +28,14 @@ try {
 
   logger.debug("Received args", args);
 
-  if (command === "container up") {
-    containerUp(config, service);
-  } else if (command === "container down") {
-    containerDown(config, service);
-  } else if (command === "route add") {
-    routeAdd(config, service);
-  } else if (command === "route remove") {
-    routeRemove(config, service);
-  } else if (command === "repo clone") {
-    cloneRepo(config, service);
-  } else if (command === "repo remove") {
-    removeRepo(config, service);
-  } else {
-    logger.warning(`Unknown command ${command}`);
+  const handler = commands[command];
+  if (!handler) {
+    logger.warning(`Unknown command "${command}"`);
+    console.log();
     usage();
+    process.exit(1);
   }
+  handler(config, service);
 } catch (e) {
   logger.warning(e.message);
   console.log();
