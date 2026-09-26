@@ -19,6 +19,9 @@
     "sshHost": {
       "type": "string"
     },
+    "projectsPath": {
+      "type": "string"
+    },
     "services": {
       "type": "object",
       "additionalProperties": {
@@ -31,6 +34,9 @@
             "type": "number"
           },
           "path": {
+            "type": "string"
+          },
+          "repo": {
             "type": "string"
           },
           "run": {

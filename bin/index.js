@@ -7,6 +7,7 @@ const containerUp = require("../src/commands/container-up");
 const containerDown = require("../src/commands/container-down");
 const routeAdd = require("../src/commands/route-add");
 const routeRemove = require("../src/commands/route-remove");
+const cloneRepo = require("../src/commands/clone-repo");
 
 try {
   const args = arg({});
@@ -25,6 +26,8 @@ try {
     routeAdd(config, service);
   } else if (command === "route remove") {
     routeRemove(config, service);
+  } else if (command === "repo clone") {
+    cloneRepo(config, service);
   } else {
     logger.warning(`Unknown command ${command}`);
     usage();
@@ -41,5 +44,6 @@ function usage() {
     ${chalk.greenBright("container down".padEnd(18))}Brings down the container
     ${chalk.greenBright("route add".padEnd(18))}Adds a route and dns record for a service
     ${chalk.greenBright("route remove".padEnd(18))}Removes a route and dns record for a service
+    ${chalk.greenBright("repo clone".padEnd(18))}Clones a service's repository on the server
   `);
 }
