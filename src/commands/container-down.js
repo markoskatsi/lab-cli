@@ -1,15 +1,11 @@
 const logger = require("../logger")("commands:container-down");
+const { getService } = require("../utils/services");
 const { execSync } = require("child_process");
 
 module.exports = function containerDown(config, serviceName) {
   logger.highlight("  Bringing down the container  ");
 
-  const service = config.services[serviceName];
-  if (!service) {
-    logger.warning(`Unknown service "${serviceName}". Known services:
-  ${Object.keys(config.services).join(", ")}`);
-    process.exit(1);
-  }
+  const service = getService(config, serviceName);
 
   try {
     logger.debug(

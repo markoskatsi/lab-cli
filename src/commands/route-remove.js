@@ -1,4 +1,5 @@
 const logger = require("../logger")("commands:route-remove");
+const { getService } = require("../utils/services");
 const {
   getTunnelConfig,
   putTunnelConfig,
@@ -9,12 +10,7 @@ const {
 module.exports = async function routeRemove(config, serviceName) {
   logger.highlight("  Removing route  ");
 
-  const service = config.services[serviceName];
-  if (!service) {
-    logger.warning(`Unknown service "${serviceName}". Known services:
-  ${Object.keys(config.services).join(", ")}`);
-    process.exit(1);
-  }
+  const service = getService(config, serviceName);
 
   const hostname = service.domain;
   const target = `${config.tunnelId}.cfargotunnel.com`;

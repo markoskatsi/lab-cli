@@ -1,4 +1,5 @@
 const logger = require("../logger")("commands:route-add");
+const { getService } = require("../utils/services");
 const {
   getTunnelConfig,
   putTunnelConfig,
@@ -8,12 +9,7 @@ const {
 module.exports = async function routeAdd(config, serviceName) {
   logger.highlight("  Adding route  ");
 
-  const service = config.services[serviceName];
-  if (!service) {
-    logger.warning(`Unknown service "${serviceName}". Known services:
-  ${Object.keys(config.services).join(", ")}`);
-    process.exit(1);
-  }
+  const service = getService(config, serviceName);
 
   try {
     const { result } = await getTunnelConfig(config);
@@ -30,7 +26,7 @@ module.exports = async function routeAdd(config, serviceName) {
 
     await putTunnelConfig(config, result.config);
     logger.log(`Routed ${hostname} -> localhost:${service.port}`);
-    
+
     await createDnsRecord(config, {
       type: "CNAME",
       name: hostname,

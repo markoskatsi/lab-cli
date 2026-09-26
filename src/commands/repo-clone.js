@@ -1,15 +1,11 @@
 const logger = require("../logger")("commands:clone-repo");
+const { getService } = require("../utils/services");
 const { execSync } = require("child_process");
 
 module.exports = function repoClone(config, serviceName) {
   logger.highlight("  Cloning the repository  ");
 
-  const service = config.services[serviceName];
-  if (!service) {
-    logger.warning(`Unknown service "${serviceName}". Known services:
-  ${Object.keys(config.services).join(", ")}`);
-    process.exit(1);
-  }
+  const service = getService(config, serviceName);
 
   try {
     logger.debug(
